@@ -1,57 +1,98 @@
 #!/usr/bin/env bash
-CONFIGS_DIR="$HOME/.config/sway/config-appender"
-DEFAULT_CONFIG_PATH="$CONFIGS_DIR/default"
-CURRENT_CONFIG_PATH="$HOME/.config/sway/appended-config"
+readonly SWAY_CONFIG_DIR="$HOME/.config/sway"
+readonly SWAY_CONFIG_MAIN="config"
+readonly CURRENT_CONFIG_PATH="$SWAY_CONFIG_DIR/appended-config"
+readonly CONFIGS_DIR="$SWAY_CONFIG_DIR/config-appender"
+readonly DEFAULT_CONFIG="default"
 
-function printerr() {
+enable_swaynag=true
+
+printerr() {
     >&2 echo -e "\033[0;31m$1\033[0m"
 }
 
-function is_uint() {
-    case $1 in '' | *[!0-9]*) return 1 ;;
-    esac
+create_default() {
+    cat >"$CONFIGS_DIR/$DEFAULT_CONFIG" <<EOF
+# This is the default config-append file
+# swayca will try to fall back to this when
+# something goes wrong.
+EOF
 }
 
-function get_file_from_index() {
-    local number="$1"
-    for file in "$CONFIGS_DIR"/*; do
-        if [ -f "$file" ]; then
-            first_line=$(head -n 1 "$file")
-            extracted_number="${first_line#\#}"
-            if [ "$extracted_number" == "$number" ]; then
-                echo "$file"
-            fi
+link_selected_config() {
+    ln -sf "$CONFIGS_DIR/$1" "$CURRENT_CONFIG_PATH"
+    swaymsg reload
+}
+
+init() {
+    if [ ! -d "$SWAY_CONFIG_DIR" ]; then
+        printerr "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
+        if [ $enable_swaynag = true ]; then
+            swaynag -m "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
         fi
-    done
-}
-
-function get_current_theme_index() {
-    local file_path="$1"
-    [ ! -f "$file_path" ] &&
-        printerr "No index found for ${file_path}." &&
         exit 1
-    first_line=$(head -n 1 "$file_path")
-    number="${first_line#\#}"
-    echo "$number"
+    elif [ ! -f "$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN" ]; then
+        printerr "Sway config directory \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
+        if [ $enable_swaynag = true ]; then
+            swaynag -m "Sway config directory \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
+        fi
+        exit 1
+    fi
+
+    [ ! -d "$CONFIGS_DIR" ] && mkdir -p "$CONFIGS_DIR"
+    [ ! -f "$CONFIGS_DIR/$DEFAULT_CONFIG" ] && create_default
+    link_selected_config "$DEFAULT_CONFIG"
 }
 
-function link_selected_theme() {
-    ln -sf "$1" "$CURRENT_CONFIG_PATH"
+# Function to print help (assuming it's defined elsewhere)
+print_help() {
+    echo "Usage: swayca [options] [config-name]"
+    echo "       swayca [config-name]"
+    echo "Options:"
+    echo "  -c [config-name]     set the config"
+    echo "  -n                  disable swaynag messages"
+    echo "  -h                  display this help message and exit"
 }
 
-[ ! -d "$CONFIGS_DIR" ] && mkdir -p "$CONFIGS_DIR"
-[ ! -f "$DEFAULT_CONFIG_PATH" ] \
-&& echo "#0" > "$HOME/.config/sway/config-appender/default"
-[ ! -f "$CURRENT_CONFIG_PATH" ] \
-&& link_selected_theme "$DEFAULT_CONFIG_PATH"
+while getopts ":nc:h" opt; do
+    case $opt in
+    n)
+        enable_swaynag=false
+        ;;
+    c)
+        selected_config=$OPTARG
+        ;;
+    h)
+        print_help
+        exit 0
+        ;;
+    *)
+        print_help
+        exit 1
+        ;;
+    esac
+done
 
-current_theme_index=$(get_current_theme_index "$CURRENT_CONFIG_PATH")
-is_uint $current_theme_index
-[ $? -eq 1 ] && printerr "invalid index found on first line: $current_theme_index" && exit 1
+shift $((OPTIND - 1))
 
-index=$((current_theme_index + 1))
-selected_theme=$(get_file_from_index "$index")
-[ ! -f "$selected_theme" ] && selected_theme=$DEFAULT_CONFIG_PATH
+if [[ -z "$selected_config" && $# -eq 1 ]]; then
+    selected_config=$1
+fi
 
-link_selected_theme "$selected_theme" \
-&& swaymsg reload
+if [[ -z "$selected_config" ]]; then
+    printerr "config name argument missing!"
+    print_help
+    exit 1
+fi
+
+if [ ! -f "$CONFIGS_DIR/$selected_config" ]; then
+    printerr "config file \"$1\" not found."
+    if [ $enable_swaynag = true ]; then
+        swaynag -m "config file \"$1\" not found. Would you like to use the default config?" \
+            -Z "Use default" "exec $0 $DEFAULT_CONFIG" \
+            -Z "Retry" "exec $0 $1"
+    fi
+    exit 1
+fi
+link_selected_config "$selected_config"
+
