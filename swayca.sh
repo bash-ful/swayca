@@ -6,7 +6,7 @@ readonly SWAY_CONFIG_MAIN="config"
 readonly SWAYCA_CONFIG_DIR="$HOME/swayca-config"
 readonly CURRENT_CONFIG_PATH="$SWAYCA_CONFIG_DIR/appended-config"
 readonly CONFIGS_DIR="$SWAYCA_CONFIG_DIR/configs"
-readonly DEFAULT_CONFIG="default"
+readonly DEFAULT_CONFIG=".default"
 
 printerr() {
     >&2 echo -e "\033[0;31m$1\033[0m"
