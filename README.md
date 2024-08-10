@@ -24,7 +24,7 @@ swayca -i
 ```
 **NOTE: this command will create a backup of your main Sway config `config.bak`, and append a line at the end of it. that's the only time it should/will alter your main config file!**
 
-this makes a backup of the main config file, appends an `include` command on your main config, and creates a `swayca-config` folder in your config directory.
+this makes a backup of the main config file, appends an `include` command on your main config, and creates a `swayca-config` folder in your `$HOME` directory.
 
 you can create your config files on `swayca-config/configs`, following Sway's config file format (`man 5 sway`).
 
