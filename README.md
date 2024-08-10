@@ -31,10 +31,12 @@ to apply/change the currently appended config, use
 ```sh
 swayca <config-name>
 ```
-where `config-name` is the name of the config file located at `swayca/configs`.
+where `config-name` is the name of the config file located at `swayca/configs`. ideally you'd use this script with `bindsym exec` to have hotkeys that change configs
 commands that may conflict with duplicates (like `bindsym`) may arise, and at the moment the script do not have features to deal with this
 
 # plans (probably maybe)
 [ ] deal with `bindsym` and other conflicting commands
 
 [ ] configurable locations of various files/directories used in the script
+
+[ ] ability to toggle/cycle between themes
