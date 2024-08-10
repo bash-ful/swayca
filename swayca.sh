@@ -58,7 +58,9 @@ initialize() {
 print_help() {
     echo "Usage: swayca [options] [config-name]"
     echo "       swayca [config-name]"
+    echo "       swayca -i"
     echo "Options:"
+    echo "  -i                  initialize swayca on your Sway config folder"
     echo "  -c [config-name]    set the config to append"
     echo "  -n                  disable swaynag messages"
     echo "  -h                  display this help message and exit"
@@ -89,12 +91,10 @@ done
 
 shift $((OPTIND - 1))
 
-# If no config name was provided via options, check for a positional argument
 if [[ -z "$selected_config" && $# -eq 1 ]]; then
     selected_config="$1"
 fi
 
-# Ensure a config name is specified
 if [[ -z "$selected_config" ]]; then
     printerr "Config name argument is missing!"
     print_help
@@ -105,7 +105,6 @@ if [ ! -f "$SWAY_CONFIG_DIR/$DEFAULT_CONFIG" ]; then
     create_default_config
 fi
 
-# Validate the specified config file
 if [ ! -f "$CONFIGS_DIR/$selected_config" ]; then
     printerr "Config file \"$CONFIGS_DIR/$selected_config\" not found."
     if [ "$enable_swaynag" = true ]; then
@@ -116,5 +115,4 @@ if [ ! -f "$CONFIGS_DIR/$selected_config" ]; then
     exit 1
 fi
 
-# Link the selected config
 link_config "$selected_config"
