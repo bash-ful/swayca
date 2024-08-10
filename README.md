@@ -36,12 +36,9 @@ swayca -c <config-name>
 ```
 where `config-name` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym` to change configs.
 
-commands that can conflict with duplicates (like `bindsym`) may arise (i.e. having the same keycombo on your main config and on the appended config). at the moment the script does not have features to deal with this
-
 to uninstall, simply delete the `swayca-config` folder, and delete the generated `include` lines on your main config file.
 
 # plans (probably maybe)
-[ ] deal with `bindsym` and other commands that conflict with duplicates
 
 [ ] configurable locations of various files/directories used in the script
 
