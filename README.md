@@ -29,10 +29,10 @@ you can create your config files on `swayca/configs`, following Sway's config fi
 
 to apply/change the currently appended config, use
 ```sh
-swayca <config-name>
+swayca -c <config-name>
 ```
-where `config-name` is the name of the config file located at `swayca/configs`. ideally you'd use this script with `bindsym exec` to have hotkeys that change configs
-commands that may conflict with duplicates (like `bindsym`) may arise, and at the moment the script do not have features to deal with this
+where `config-name` is the name of the config file located at `swayca/configs`. ideally you'd use this script with `bindsym exec` to have hotkeys that change configs.
+commands that may conflict with duplicates (like `bindsym`) may arise, and at the moment the script does not have features to deal with this
 
 # plans (probably maybe)
 [ ] deal with `bindsym` and other conflicting commands
