@@ -10,7 +10,7 @@ it uses Sway's `include` to point to a symlink, which the script modifies to poi
 # prerequisites
 - your Sway config directory is located at `$HOME/.config/sway`, with the main config named `config`
 - Sway is installed on your device
-- make a backup of your sway config folder, just in case
+- make a backup of your Sway config folder, just in case
 
 # installation
 ```sh
@@ -27,6 +27,8 @@ swayca -i
 this makes a backup of the main config file, appends an `include` command on your main config, and creates a `swayca` folder in your config directory.
 you can create your config files on `swayca/configs`, following Sway's config file format (`man 5 sway`)
 
+unless something has gone horribly wrong, you only really need to run this **once**.
+
 to apply/change the currently appended config, use
 ```sh
 swayca -c <config-name>
@@ -35,7 +37,7 @@ where `config-name` is the name of the config file located at `swayca/configs`. 
 commands that may conflict with duplicates (like `bindsym`) may arise, and at the moment the script does not have features to deal with this
 
 # plans (probably maybe)
-[ ] deal with `bindsym` and other conflicting commands
+[ ] deal with `bindsym` and other commands that conflict with duplicates
 
 [ ] configurable locations of various files/directories used in the script
 
