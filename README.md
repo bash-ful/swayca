@@ -8,9 +8,9 @@ you can switch between configs to append to Sway's main config, allowing you to 
 it uses Sway's `include` to point to a symlink, which the script modifies to point to different files (i.e. the configs)
 
 # prerequisites
+- Sway
 - your Sway config directory is located at `$HOME/.config/sway`, with the main config named `config`
-- Sway is installed on your device
-- make a backup of your Sway config folder, just in case
+- a backup of your Sway config folder, just in case
 
 # installation
 ```sh
