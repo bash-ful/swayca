@@ -43,3 +43,5 @@ to uninstall, simply delete the `swayca-config` folder, and delete the generated
 [ ] configurable locations of various files/directories used in the script
 
 [ ] ability to toggle/cycle between themes
+
+[ ] better option/argument parsing because holy hell it sucks currently
