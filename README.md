@@ -33,7 +33,7 @@ to apply/change the currently appended config, use
 ```sh
 swayca -c <config-name>
 ```
-where `config-name` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym exec` to have hotkeys that change configs.
+where `config-name` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym` to change configs.
 commands that may conflict with duplicates (like `bindsym`) may arise, and at the moment the script does not have features to deal with this
 
 to uninstall, simply delete the `swayca-config` folder, and delete the `include` lines on your main config file.
