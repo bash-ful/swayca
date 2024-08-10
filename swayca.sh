@@ -2,12 +2,11 @@
 
 readonly SWAY_CONFIG_DIR="$HOME/.config/sway"
 readonly SWAY_CONFIG_MAIN="config"
-readonly SWAYCA_CONFIG_DIR="$SWAY_CONFIG_DIR/swayca-config"
+
+readonly SWAYCA_CONFIG_DIR="$HOME/swayca-config"
 readonly CURRENT_CONFIG_PATH="$SWAYCA_CONFIG_DIR/appended-config"
 readonly CONFIGS_DIR="$SWAYCA_CONFIG_DIR/configs"
 readonly DEFAULT_CONFIG="default"
-
-enable_swaynag=true
 
 printerr() {
     >&2 echo -e "\033[0;31m$1\033[0m"
@@ -38,16 +37,22 @@ link_config() {
     swaymsg reload
 }
 
-initialize() {
+init() {
     if [ ! -d "$SWAY_CONFIG_DIR" ]; then
         printerr "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
-        [ "$enable_swaynag" = true ] && swaynag -m "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
-        exit 1
-    elif [ ! -f "$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN" ]; then
-        printerr "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
-        [ "$enable_swaynag" = true ] && swaynag -m "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
+        if [ "$enable_swaynag" = true ]; then
+            swaynag -m "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
+        fi
         exit 1
     fi
+    if [ ! -f "$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN" ]; then
+        printerr "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
+        if [ "$enable_swaynag" = true ]; then
+            swaynag -m "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
+        fi
+        exit 1
+    fi
+
     backup_sway_config
     echo "include $CURRENT_CONFIG_PATH" >>"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN"
     mkdir -p "$CONFIGS_DIR"
@@ -56,20 +61,26 @@ initialize() {
 }
 
 print_help() {
-    echo "Usage: swayca [options] [config-name]"
-    echo "       swayca [config-name]"
-    echo "       swayca -i"
+    echo "Usage: swayca [-n] -c <config-name>"
+    echo "       swayca -i|-h"
     echo "Options:"
-    echo "  -i                  initialize swayca on your Sway config folder"
-    echo "  -c [config-name]    set the config to append"
+    echo "  -i                  initialize swayca"
+    echo "                      you should only ever run this on initial install, ONCE"
+    echo "  -c <config-name>    set the config to append"
     echo "  -n                  disable swaynag messages"
     echo "  -h                  display this help message and exit"
 }
 
+enable_swaynag=true
+selected_config=""
 while getopts ":nc:hi" opt; do
     case $opt in
     i)
-        initialize
+        init
+        exit 0
+        ;;
+    h)
+        print_help
         exit 0
         ;;
     n)
@@ -77,10 +88,6 @@ while getopts ":nc:hi" opt; do
         ;;
     c)
         selected_config="$OPTARG"
-        ;;
-    h)
-        print_help
-        exit 0
         ;;
     *)
         print_help
@@ -91,11 +98,10 @@ done
 
 shift $((OPTIND - 1))
 
-if [[ -z "$selected_config" && $# -eq 1 ]]; then
-    selected_config="$1"
-fi
-
 if [[ -z "$selected_config" ]]; then
+    if [ "$enable_swaynag" = true ]; then
+        swaynag -m "Config name argument is missing!"
+    fi
     printerr "Config name argument is missing!"
     print_help
     exit 1
@@ -109,8 +115,8 @@ if [ ! -f "$CONFIGS_DIR/$selected_config" ]; then
     printerr "Config file \"$CONFIGS_DIR/$selected_config\" not found."
     if [ "$enable_swaynag" = true ]; then
         swaynag -m "Config file \"$CONFIGS_DIR/$selected_config\" not found. Would you like to use the default config?" \
-            -Z "Use default" "exec $0 $DEFAULT_CONFIG" \
-            -Z "Retry" "exec $0 $selected_config"
+            -Z "Use default" "exec $0 -c $DEFAULT_CONFIG" \
+            -Z "Retry" "exec $0 -c $selected_config"
     fi
     exit 1
 fi
