@@ -42,3 +42,6 @@ to uninstall, simply delete the `swayca-config` folder, and delete the generated
 - [x] ability to toggle/cycle between configs
 
 - [ ] fix option/argument parsing because holy hell it sucks
+
+# notes
+  - Sway quirks like the config version of `gaps` not updating on existing workspaces still apply here
