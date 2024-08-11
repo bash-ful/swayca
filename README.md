@@ -18,7 +18,7 @@ chmod +x swayca
 ```
 swayca -i
 ```
-**NOTE: this command will create a backup of your main Sway config `config.bak`, and append a line at the end of it. that's the only time it should/will alter your main config file! unless something has gone horribly wrong, you only really need to run this once.**
+**NOTE: this command will create a backup of your main Sway config `config.bak`, and append a line at the end of your main config. that's the only time it should/will alter your main config file! unless something has gone horribly wrong, you only really need to run this once.**
 
 this makes a backup of the main config file, appends an `include` command on your main config, and creates a `swayca-config` folder in your `$HOME` directory.
 
