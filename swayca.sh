@@ -105,7 +105,7 @@ print_help() {
     echo "  -h                                           display this help message and exit"
 }
 
-while getopts ":nc:hit:" opt; do
+while getopts ":hinc:" opt; do
     case $opt in
     i)
         init
