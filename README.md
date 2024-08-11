@@ -38,10 +38,9 @@ to uninstall, simply delete the `swayca-config` folder, and delete the generated
 # plans (probably maybe)
 
 - [ ] configurable locations of various files/directories used in the script
-
 - [x] ability to toggle/cycle between configs
-
 - [ ] fix option/argument parsing because holy hell it sucks
+- [ ] optimize the code because it's absolute dog water
 
 # notes
   - Sway quirks like the config version of `gaps` not updating on existing workspaces still apply here
