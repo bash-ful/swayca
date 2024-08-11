@@ -1,11 +1,7 @@
 # swayca
 sway-config-appender, a bash script that allows you to append config files for your Sway needs
-## what
-this script allows you to append a different Sway config to the "main" config, effectively allowing you to have presets that you can select and activate during Sway runtime. i made this script in a way that modifies the main Sway config file as little as possible
-## why
-you can switch between configs to append to Sway's main config, allowing you to store and cycle through your configs that may modify Sway's functionality and appearance. as to why i made this script, it's fun
-## how (it works)
-it uses Sway's `include` to point to a symlink, which the script modifies to point to different files (i.e. the configs)
+
+this script allows you to append a different Sway config to the "main" config, effectively allowing you to have presets that you can select and activate during Sway runtime. i made this script in a way that modifies the main Sway config file as little as possible. the script uses Sway's `include` to point to a symlink, which the script modifies to point to different files (i.e. the configs)
 
 # prerequisites
 - Sway
@@ -32,16 +28,18 @@ unless something has gone horribly wrong, you only really need to run this **onc
 
 to apply/change the currently appended config, use
 ```sh
-swayca -c <config-name>
+swayca -c CONFIG [CONFIG-2 CONFIG-3 ...]
 ```
-where `config-name` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym` to change configs.
+where `CONFIG` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym` to change configs.
+
+you can also pass multiple config names, allowing you to cycle/toggle between them.
 
 to uninstall, simply delete the `swayca-config` folder, and delete the generated `include` lines on your main config file.
 
 # plans (probably maybe)
 
-[ ] configurable locations of various files/directories used in the script
+- [ ] configurable locations of various files/directories used in the script
 
-[ ] ability to toggle/cycle between themes
+- [x] ability to toggle/cycle between configs
 
-[ ] better option/argument parsing because holy hell it sucks currently
+- [ ] fix option/argument parsing because holy hell it sucks
