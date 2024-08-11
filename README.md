@@ -15,25 +15,28 @@ chmod +x swayca
 ```
 
 # usage
+## initialization
 ```
 swayca -i
 ```
-**NOTE: this command will create a backup of your main Sway config `config.bak`, and append a line at the end of your main config. that's the only time it should/will alter your main config file! unless something has gone horribly wrong, you only really need to run this once.**
+**NOTE: this command will create a backup of your main Sway config `config.bak`, and append a line at the end of your main config. that's the only time it should/will alter your main config file! unless something has gone horribly wrong, you only really need to run this once**
 
-this makes a backup of the main config file, appends an `include` command on your main config, and creates a `swayca-config` folder in your `$HOME` directory.
+this makes a backup of the main config file, appends an `include` command on your main config, and creates a `swayca-config` folder in your `$HOME` directory
 
-you can create your config files on `swayca-config/configs`, following Sway's config file format (`man 5 sway`).
+you can create your config files on `swayca-config/configs`, following Sway's config file format (`man 5 sway`)
 
 
-to apply/change the currently appended config, use
+## change to/between configs
 ```
-swayca -c CONFIG [CONFIG-2 CONFIG-3 ...]
+swayca [-n] -c CONFIG [CONFIG-2 CONFIG-3 ...]
 ```
-where `CONFIG` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym` to change configs.
+where `CONFIG` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym` to change configs
 
-you can also pass multiple config names, allowing you to cycle/toggle between them.
+you can also pass multiple config names, allowing you to cycle/toggle between them
 
-to uninstall, simply delete the `swayca-config` folder, and delete the generated `include` lines on your main config file.
+there is a fallback config `.default` found on the `configs` folder. swayca will prompt you via `swaynag` to choose this config if the selected config is not found. this prompt is disabled if `-n` is passed
+
+to uninstall, simply delete the `swayca-config` folder, and delete the generated `include` lines on your main config file
 
 # plans (probably maybe)
 
