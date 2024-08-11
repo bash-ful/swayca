@@ -65,8 +65,8 @@ init() {
         exit 1
     fi
     echo "Sway config found: $SWAY_CONFIG_PATH"
-    backup_sway_config
-    echo "include $SELECTED_CONFIG_SYMLINK" >>"$SWAY_CONFIG_PATH"
+    # don't backup and append if include line exists on main config file
+    grep -Fxq "include $SELECTED_CONFIG_SYMLINK" "$SWAY_CONFIG_PATH" || { backup_sway_config && echo "include $SELECTED_CONFIG_SYMLINK" >>"$SWAY_CONFIG_PATH"; }
     mkdir -p "$CONFIGS_DIR"
     [ ! -f "$CONFIGS_DIR/$DEFAULT_CONFIG" ] && create_default_config
     link_config "$DEFAULT_CONFIG"
