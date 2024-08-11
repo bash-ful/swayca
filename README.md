@@ -43,4 +43,4 @@ to uninstall, simply delete the `swayca-config` folder, and delete the generated
 - [ ] optimize the code because it's absolute dog water
 
 # notes
-  - Sway quirks like the config version of `gaps` not updating on existing workspaces still apply here
+  - Sway quirks (the config version of `gaps` not updating on existing workspaces, `bindsym` overwrite warnings, etc) still apply here
