@@ -44,18 +44,14 @@ link_config() {
 
 cycle() {
     local selected_config_name config_list target_index next_index
-
     if [ "$#" -lt 1 ]; then
         echo "Usage: $0 -c CONFIG [CONFIG-2 CONFIG-3 ...]"
         exit 1
     fi
-
-    # return first arg if there's only one arg passed
     if [ "$#" -eq 1 ]; then
         echo "$1"
         return
     fi
-
     selected_config_name=$(head -n 1 "$CURRENT_CONFIG_NAME")
     config_list=("$@")
     for ((i = 0; i < ${#config_list[@]}; i++)); do
@@ -64,7 +60,6 @@ cycle() {
             break
         fi
     done
-
     next_index=$(((target_index + 1) % ${#config_list[@]}))
     echo "${config_list[$next_index]}"
 }
@@ -72,19 +67,14 @@ cycle() {
 init() {
     if [ ! -d "$SWAY_CONFIG_DIR" ]; then
         printerr "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
-        if [ "$enable_swaynag" = true ]; then
-            swaynag -m "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
-        fi
+        [ "$enable_swaynag" = true ] && swaynag -m "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
         exit 1
     fi
     if [ ! -f "$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN" ]; then
         printerr "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
-        if [ "$enable_swaynag" = true ]; then
-            swaynag -m "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
-        fi
+        [ "$enable_swaynag" = true ] && swaynag -m "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
         exit 1
     fi
-
     backup_sway_config
     echo "include $SELECTED_CONFIG_SYMLINK" >>"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN"
     mkdir -p "$CONFIGS_DIR"
@@ -133,9 +123,7 @@ done
 shift $((OPTIND - 1))
 
 if [[ -z "$selected_config" ]]; then
-    if [ "$enable_swaynag" = true ]; then
-        swaynag -m "Config name argument is missing!"
-    fi
+    [ "$enable_swaynag" = true ] && swaynag -m "Config name argument is missing!"
     printerr "Config name argument is missing!"
     print_help
     exit 1
@@ -147,11 +135,9 @@ fi
 
 if [ ! -f "$CONFIGS_DIR/$selected_config" ]; then
     printerr "Config file \"$CONFIGS_DIR/$selected_config\" not found."
-    if [ "$enable_swaynag" = true ]; then
-        swaynag -m "Config file \"$CONFIGS_DIR/$selected_config\" not found. Would you like to use the default config?" \
-            -Z "Use default" "exec $0 -c $DEFAULT_CONFIG" \
-            -Z "Retry" "exec $0 -c $selected_config"
-    fi
+    [ "$enable_swaynag" = true ] && swaynag -m "Config file \"$CONFIGS_DIR/$selected_config\" not found. Would you like to use the default config?" \
+        -Z "Use default" "exec $0 -c $DEFAULT_CONFIG" \
+        -Z "Retry" "exec $0 -c $selected_config"
     exit 1
 fi
 
