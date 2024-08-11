@@ -1,5 +1,5 @@
-# swayca
-sway-config-appender, a bash script that allows you to append config files for your Sway needs
+# sway-config-appender
+a bash script that allows you to append config files for your Sway needs
 
 this script allows you to append a different Sway config to the "main" config, effectively allowing you to have presets that you can select and activate during Sway runtime. i made this script in a way that modifies the main Sway config file as little as possible. the script uses Sway's `include` to point to a symlink, which the script modifies to point to different files (i.e. the configs)
 
