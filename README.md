@@ -5,8 +5,8 @@ this script allows you to append a different Sway config to the "main" config, e
 
 # prerequisites
 - Sway
-- your Sway config directory is located at `$HOME/.config/sway`, with the main config named `config`
-- a backup of your Sway config folder, just in case
+- your Sway config directory is located at `XDG_CONFIG_HOME/sway/config`
+- a backup of your main Sway config file, just in case
 
 # installation
 ```
@@ -30,13 +30,16 @@ you can create your config files on `swayca-config/configs`, following Sway's co
 ```
 swayca [-n] -c CONFIG [CONFIG-2 CONFIG-3 ...]
 ```
-where `CONFIG` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym` to change configs
+where `CONFIG` is the name of the config file located at `swayca-config/configs`. ideally you'd use this script with `bindsym` to change configs, i.e.
+```
+bindsym $mod+t exec "path/to/swayca -c CONFIG"
+```
 
 you can also pass multiple config names, allowing you to cycle/toggle between them
 
-there is a fallback config `.default` found on the `configs` folder. swayca will prompt you via `swaynag` to choose this config if the selected config is not found. this prompt is disabled if `-n` is passed
+there is a fallback config `.default` found on the `configs` folder. swayca will prompt you via `swaynag` to choose this config if the currently selected config is not found. this prompt is disabled if `-n` is passed
 
-to uninstall, simply delete the `swayca-config` folder, and delete the generated `include` lines on your main config file
+to uninstall, simply delete the `swayca-config` folder, and delete the generated `include` lines on your main config file. you can also choose to restore or delete the generated `config.bak` file/s.
 
 # plans (probably maybe)
 
