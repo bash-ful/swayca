@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
-readonly SWAY_CONFIG_DIR="$HOME/.config/sway"
-readonly SWAY_CONFIG_MAIN="config"
-
-readonly SWAYCA_CONFIG_DIR="$HOME/swayca-config"
-readonly SELECTED_CONFIG_SYMLINK="$SWAYCA_CONFIG_DIR/appended-config"
-readonly CURRENT_CONFIG_NAME="$SWAYCA_CONFIG_DIR/.current"
-readonly CONFIGS_DIR="$SWAYCA_CONFIG_DIR/configs"
+readonly SWAY_CONFIG_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/sway/config"
+readonly SWAYCA_DIR="$HOME/swayca-config"
+readonly SELECTED_CONFIG_SYMLINK="$SWAYCA_DIR/appended-config"
+readonly CURRENT_CONFIG_NAME="$SWAYCA_DIR/.current"
+readonly CONFIGS_DIR="$SWAYCA_DIR/configs"
 readonly DEFAULT_CONFIG=".default"
 
 enable_swaynag=true
@@ -25,14 +23,14 @@ EOF
 }
 
 backup_sway_config() {
-    local backup_file="$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN.bak"
+    local backup_file="$SWAY_CONFIG_PATH.bak"
     local suffix=1
     while [ -f "$backup_file" ]; do
-        backup_file="$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN.bak.$suffix"
+        backup_file="$SWAY_CONFIG_PATH.bak.$suffix"
         ((suffix++))
     done
-    cp "$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN" "$backup_file"
-    echo "main config backup created at: $backup_file"
+    cp "$SWAY_CONFIG_PATH" "$backup_file"
+    echo "main config backup created: $backup_file"
 }
 
 link_config() {
@@ -44,10 +42,6 @@ link_config() {
 
 cycle() {
     local selected_config_name config_list target_index next_index
-    if [ "$#" -lt 1 ]; then
-        echo "Usage: $0 -c CONFIG [CONFIG-2 CONFIG-3 ...]"
-        exit 1
-    fi
     if [ "$#" -eq 1 ]; then
         echo "$1"
         return
@@ -55,7 +49,7 @@ cycle() {
     selected_config_name=$(head -n 1 "$CURRENT_CONFIG_NAME")
     config_list=("$@")
     for ((i = 0; i < ${#config_list[@]}; i++)); do
-        if [[ "${config_list[$i]}" == "$selected_config_name" ]]; then
+        if [ "${config_list[$i]}" == "$selected_config_name" ]; then
             target_index=$i
             break
         fi
@@ -65,18 +59,14 @@ cycle() {
 }
 
 init() {
-    if [ ! -d "$SWAY_CONFIG_DIR" ]; then
-        printerr "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
-        [ "$enable_swaynag" = true ] && swaynag -m "Sway config directory \"$SWAY_CONFIG_DIR\" not found!"
+    if [ ! -f "$SWAY_CONFIG_PATH" ]; then
+        printerr "Sway config directory \"$SWAY_CONFIG_PATH\" not found!"
+        [ "$enable_swaynag" = true ] && swaynag -m "Sway config file \"$SWAY_CONFIG_PATH\" not found!"
         exit 1
     fi
-    if [ ! -f "$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN" ]; then
-        printerr "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
-        [ "$enable_swaynag" = true ] && swaynag -m "Sway config file \"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN\" not found!"
-        exit 1
-    fi
+    echo "Sway config found: $SWAY_CONFIG_PATH"
     backup_sway_config
-    echo "include $SELECTED_CONFIG_SYMLINK" >>"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN"
+    echo "include $SELECTED_CONFIG_SYMLINK" >>"$SWAY_CONFIG_PATH"
     mkdir -p "$CONFIGS_DIR"
     [ ! -f "$CONFIGS_DIR/$DEFAULT_CONFIG" ] && create_default_config
     link_config "$DEFAULT_CONFIG"
@@ -122,14 +112,14 @@ done
 
 shift $((OPTIND - 1))
 
-if [[ -z "$selected_config" ]]; then
+if [ -z "$selected_config" ]; then
     [ "$enable_swaynag" = true ] && swaynag -m "Config name argument is missing!"
     printerr "Config name argument is missing!"
     print_help
     exit 1
 fi
 
-if [ ! -f "$SWAY_CONFIG_DIR/$DEFAULT_CONFIG" ]; then
+if [ ! -f "$SWAY_CONFIG_PATH/$DEFAULT_CONFIG" ]; then
     create_default_config
 fi
 
