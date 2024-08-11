@@ -4,9 +4,13 @@ readonly SWAY_CONFIG_DIR="$HOME/.config/sway"
 readonly SWAY_CONFIG_MAIN="config"
 
 readonly SWAYCA_CONFIG_DIR="$HOME/swayca-config"
-readonly CURRENT_CONFIG_PATH="$SWAYCA_CONFIG_DIR/appended-config"
+readonly SELECTED_CONFIG_SYMLINK="$SWAYCA_CONFIG_DIR/appended-config"
+readonly CURRENT_CONFIG_NAME="$SWAYCA_CONFIG_DIR/.current"
 readonly CONFIGS_DIR="$SWAYCA_CONFIG_DIR/configs"
 readonly DEFAULT_CONFIG=".default"
+
+enable_swaynag=true
+selected_config=""
 
 printerr() {
     >&2 echo -e "\033[0;31m$1\033[0m"
@@ -33,8 +37,36 @@ backup_sway_config() {
 
 link_config() {
     local config_name="$1"
-    ln -sf "$CONFIGS_DIR/$config_name" "$CURRENT_CONFIG_PATH"
+    ln -sf "$CONFIGS_DIR/$config_name" "$SELECTED_CONFIG_SYMLINK"
+    echo "$config_name" >"$CURRENT_CONFIG_NAME"
     swaymsg reload
+}
+
+cycle() {
+    local selected_config_name config_list target_index next_index
+
+    if [ "$#" -lt 1 ]; then
+        echo "Usage: $0 -c CONFIG [CONFIG-2 CONFIG-3 ...]"
+        exit 1
+    fi
+
+    # return first arg if there's only one arg passed
+    if [ "$#" -eq 1 ]; then
+        echo "$1"
+        return
+    fi
+
+    selected_config_name=$(head -n 1 "$CURRENT_CONFIG_NAME")
+    config_list=("$@")
+    for ((i = 0; i < ${#config_list[@]}; i++)); do
+        if [[ "${config_list[$i]}" == "$selected_config_name" ]]; then
+            target_index=$i
+            break
+        fi
+    done
+
+    next_index=$(((target_index + 1) % ${#config_list[@]}))
+    echo "${config_list[$next_index]}"
 }
 
 init() {
@@ -54,26 +86,26 @@ init() {
     fi
 
     backup_sway_config
-    echo "include $CURRENT_CONFIG_PATH" >>"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN"
+    echo "include $SELECTED_CONFIG_SYMLINK" >>"$SWAY_CONFIG_DIR/$SWAY_CONFIG_MAIN"
     mkdir -p "$CONFIGS_DIR"
     [ ! -f "$CONFIGS_DIR/$DEFAULT_CONFIG" ] && create_default_config
     link_config "$DEFAULT_CONFIG"
 }
 
 print_help() {
-    echo "Usage: swayca [-n] -c <config-name>"
-    echo "       swayca -i|-h"
+    local filename
+    filename=$(basename "$0")
+    echo "Usage: $filename [-n] -c CONFIG [CONFIG-2 CONFIG-3 ...]"
+    echo "       $filename -i|h"
     echo "Options:"
-    echo "  -i                  initialize swayca"
-    echo "                      you should only ever run this on initial install, ONCE"
-    echo "  -c <config-name>    set the config to append"
-    echo "  -n                  disable swaynag messages"
-    echo "  -h                  display this help message and exit"
+    echo "  -i                                           initialize $filename"
+    echo "  -c CONFIG [CONFIG-2 CONFIG-3 ...]            set the config to append"
+    echo "                                               if multiple configs are given, cycle through each one"
+    echo "  -n                                           disable swaynag messages"
+    echo "  -h                                           display this help message and exit"
 }
 
-enable_swaynag=true
-selected_config=""
-while getopts ":nc:hi" opt; do
+while getopts ":nc:hit:" opt; do
     case $opt in
     i)
         init
@@ -87,7 +119,9 @@ while getopts ":nc:hi" opt; do
         enable_swaynag=false
         ;;
     c)
-        selected_config="$OPTARG"
+        shift
+        selected_config=$(cycle "$@")
+
         ;;
     *)
         print_help
